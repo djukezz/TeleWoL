@@ -1,8 +1,10 @@
-﻿namespace StateTest;
+﻿using StateTest;
+using TeleWoL.Commands;
+
+namespace TeleWoL.States;
 
 internal abstract class StateBase
 {
-    public abstract string Name { get; }
     public virtual string Description { get; } = string.Empty;
     public IReadOnlyCollection<CommandBase> Commands => _commands;
     protected abstract Response? Execute(CommandBase command, out StateBase newState);
@@ -17,6 +19,8 @@ internal abstract class StateBase
         newState = this;
         return Response.Unknown;
     }
+    public event Action? SettingsChanged;
 
+    protected void FireSettingsChanged() => SettingsChanged?.Invoke();
     protected readonly List<CommandBase> _commands = new List<CommandBase>();
 }

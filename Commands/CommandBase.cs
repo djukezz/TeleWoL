@@ -1,8 +1,13 @@
-﻿namespace StateTest;
+﻿namespace TeleWoL.Commands;
 
 internal abstract class CommandBase
 {
-    public string Id { get; set; } = string.Empty;
+    protected CommandBase()
+    {
+        Id = GetType().Name;
+    }
+
+    public string Id { get; set; }
     public string Text { get; init; } = string.Empty;
     public virtual bool Match(string cmd) => cmd == Id;
 }

@@ -1,4 +1,6 @@
-﻿namespace StateTest;
+﻿using TeleWoL.Settings;
+
+namespace TeleWoL.States;
 
 internal abstract class UserStateBase : StateBase
 {
