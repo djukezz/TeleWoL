@@ -1,14 +1,17 @@
-﻿namespace StateTest;
+﻿using StateTest;
+using TeleWoL.Commands;
+using TeleWoL.Settings;
 
-internal class IdleState : UserStateBase
+namespace TeleWoL.States;
+
+internal class MainState : UserStateBase
 {
-    public IdleState(UserSettings settings) : base(settings)
+    public MainState(UserSettings settings) : base(settings)
     {
-        _commands.AddRange(settings.Targets
+        _commands.AddRange(settings.GetTargets()
             .Select(t => new TurnOnCommand(t)));
+        _commands.Add(SettingsCommand.Instance);
     }
-
-    public override string Name => "Idle";
 
     protected override Response? Execute(CommandBase command, out StateBase newState)
     {
@@ -17,7 +20,10 @@ internal class IdleState : UserStateBase
             return turnOnCommand.Execute();
 
         if (command is SettingsCommand)
+        {
             newState = new SettingsState(_settings);
+            return null;
+        }
 
         return Response.Unknown;
     }

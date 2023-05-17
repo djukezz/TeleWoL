@@ -10,7 +10,8 @@ internal record Response
         KeyboardMarkup = keyboardMarkup;
     }
 
-    public static readonly Response? Unknown = "Unknown command";
+    public static readonly Response Unknown = "Unknown command";
+
     public string Text { get; }
     public InlineKeyboardMarkup? KeyboardMarkup { get; }
 

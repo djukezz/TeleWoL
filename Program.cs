@@ -4,18 +4,18 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using System.Collections.Concurrent;
+using TeleWoL.Settings;
 
 ConcurrentDictionary<long, Session> _sessions = new ConcurrentDictionary<long, Session>();
-UsersSettings _usersSettings = new UsersSettings();
+var settingsWrapper = new SettingsWrapper<GlobalSettings>("settings.bin");
 
 var botClient = new TelegramBotClient("6050754775:AAFQUT_kLk8uzvvDDbaIk6hnDWJrkvTY-Mw");
 
 using CancellationTokenSource cts = new();
 
-// StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
 ReceiverOptions receiverOptions = new()
 {
-    AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
+    AllowedUpdates = Array.Empty<UpdateType>(),
 };
 
 botClient.StartReceiving(
@@ -73,14 +73,16 @@ async Task Process(ITelegramBotClient bot, CancellationToken ct, long chatId,
     Session session, string command)
 {
     var responses = session.Execute(command);
+    if (session.GetIsSettingsChanged())
+        settingsWrapper.Save();
     foreach (var response in responses)
     {
-        Message sentMessage = await bot.SendTextMessageAsync(
+        await bot.SendTextMessageAsync(
             chatId: chatId,
             text: response.Text == string.Empty ? "Select" : response.Text,
             replyMarkup: response.KeyboardMarkup,
             cancellationToken: ct);
-    }
+    }        
 }
 
 Task HandlePollingErrorAsync(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
@@ -89,7 +91,7 @@ Task HandlePollingErrorAsync(ITelegramBotClient arg1, Exception arg2, Cancellati
 }
 
 Session GetSession(long userId) => _sessions.GetOrAdd(userId,
-        id => new Session(_usersSettings, new UserContext { UserId = id }));
+        id => new Session(settingsWrapper.Settings, new UserContext { UserId = id }));
 
 Console.ReadLine();
 

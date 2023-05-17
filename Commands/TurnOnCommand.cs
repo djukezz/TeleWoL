@@ -1,4 +1,7 @@
-﻿namespace StateTest;
+﻿using StateTest;
+using TeleWoL.Settings;
+
+namespace TeleWoL.Commands;
 
 internal class TurnOnCommand : CommandBase
 {
@@ -6,7 +9,7 @@ internal class TurnOnCommand : CommandBase
     {
         _target = target;
         Id = $"turnOn_{target.Name}";
-        Text = _target.Name;
+        Text = $"Wake up '{_target.Name}'";
     }
 
     private Target _target;
