@@ -19,6 +19,6 @@ internal class DeleteTargetCommand : CommandBase
     public Response Execute()
     {
         bool res = _settings.DeleteTarget(_target);
-        return $"'{_target.Name} ' deleted";
+        return $"Target '{_target.Name} ' deleted";
     }
 }

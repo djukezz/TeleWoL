@@ -9,6 +9,9 @@ const string _settingsFile = "settings.json";
 ConcurrentDictionary<long, Session> _sessions = new ConcurrentDictionary<long, Session>();
 using var _settingsWrapper = new SettingsWrapper<GlobalSettings>("settings.json");
 
+_settingsWrapper.Settings.GetOrAdd(12345).UserName = "user1234";
+_settingsWrapper.Settings.GetOrAdd(666).UserName = "user666";
+
 if (string.IsNullOrWhiteSpace(_settingsWrapper.Settings.Token))
     throw new Exception($"Token must be specified in {_settingsFile}");
 
@@ -53,8 +56,7 @@ async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, Cancellation
 
 async Task ProcessMessage(ITelegramBotClient bot, Message message, CancellationToken ct)
 {
-    if (message.Text is not { } messageText)
-        return;
+    string messageText = message.Text ?? message.Contact?.UserId?.ToString() ?? string.Empty;
 
     var user = message.From;
     if (user == null)

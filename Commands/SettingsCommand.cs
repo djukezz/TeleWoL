@@ -1,6 +1,8 @@
-﻿namespace TeleWoL.Commands;
+﻿using TeleWoL.States;
 
-internal class SettingsCommand : CommandBase
+namespace TeleWoL.Commands;
+
+internal class SettingsCommand : StateCommandBase<SettingsState>
 {
     private SettingsCommand()
     {

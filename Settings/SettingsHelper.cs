@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
-using TeleWoL.Common;
 
 namespace TeleWoL.Settings
 {
     internal class SettingsWrapper<T> : IDisposable
         where T:class, new()
     {
-        private readonly object _lock = new object();
         private readonly string _filePath;
         private readonly JsonSerializer _serializer;
         private Mutex _mutex;
@@ -45,7 +43,6 @@ namespace TeleWoL.Settings
             {
                 _mutex.ReleaseMutex();
             }
-            _filePath = filePath;
         }
 
         public void Save()

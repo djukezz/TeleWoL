@@ -4,9 +4,9 @@ using TeleWoL.Settings;
 
 namespace TeleWoL.States;
 
-internal class AddTargetState : UserStateBase
+internal class AddTargetState : StateBase
 {
-    public AddTargetState(UserSettings settings) : base(settings)
+    public override void Init()
     {
         _commands.Add(GoHomeCommand.Instance);
     }
@@ -20,11 +20,12 @@ internal class AddTargetState : UserStateBase
     protected override Response? Execute(CommandBase command, out StateBase newState)
     {
         newState = this;
-        if (command is GoHomeCommand)
+        if (command is IStateCommand stateCommand)
         {
-            newState = new MainState(_settings);
+            newState = stateCommand.Execute(StatesFactory);
             return null;
         }
+
         if (command is StringCommand stringCommand)
         {
             string text = stringCommand.Text.Trim();
@@ -39,8 +40,7 @@ internal class AddTargetState : UserStateBase
                 else if (_macEntering && ValidateMac(text, out var mac))
                 {
                     var target = new Target { Name = _name, Mac = mac };
-                    _settings.AddTarget(target);
-                    newState = new SettingsState(_settings);
+                    UserSettings.AddTarget(target);
                     FireSettingsChanged();
                     return new Response($"Target {target.Name} added!");
                 }
@@ -70,7 +70,7 @@ internal class AddTargetState : UserStateBase
     }
 
 
-    private bool ValidateName(string text) => !_settings.GetTargets().Any(t => t.Name == text);
+    private bool ValidateName(string text) => !UserSettings.GetTargets().Any(t => t.Name == text);
 
     protected override CommandBase? ConvertCommand(string command) => StringCommand.FromString(command);
 }

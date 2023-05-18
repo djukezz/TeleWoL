@@ -4,12 +4,13 @@ using TeleWoL.Settings;
 
 namespace TeleWoL.States;
 
-internal class MainState : UserStateBase
+internal class MainState : StateBase
 {
-    public MainState(UserSettings settings) : base(settings)
+    public override void Init()
     {
-        _commands.AddRange(settings.GetTargets()
+        _commands.AddRange(UserSettings.GetTargets()
             .Select(t => new TurnOnCommand(t)));
+
         _commands.Add(SettingsCommand.Instance);
     }
 
@@ -19,9 +20,9 @@ internal class MainState : UserStateBase
         if (command is TurnOnCommand turnOnCommand)
             return turnOnCommand.Execute();
 
-        if (command is SettingsCommand)
+        if (command is IStateCommand stateCommand)
         {
-            newState = new SettingsState(_settings);
+            newState = stateCommand.Execute(StatesFactory);
             return null;
         }
 

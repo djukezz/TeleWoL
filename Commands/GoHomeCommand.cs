@@ -1,6 +1,8 @@
-﻿namespace TeleWoL.Commands;
+﻿using TeleWoL.States;
 
-internal class GoHomeCommand : CommandBase
+namespace TeleWoL.Commands;
+
+internal class GoHomeCommand : StateCommandBase<MainState>
 {
     private GoHomeCommand()
     {

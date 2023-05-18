@@ -24,6 +24,22 @@ internal sealed class GlobalSettings
         }
     }
 
+    public bool Delete(long userId)
+    {
+        lock (_lock)
+        {
+            for (int i = 0; i < Users.Count; i++)
+            {
+                if (Users[i].UserId == userId)
+                {
+                    Users.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     public UserSettings GetOrAdd(long userId)
     {
         lock (_lock)
@@ -47,22 +63,12 @@ internal sealed class GlobalSettings
         }
     }
 
-    public void Read(BinaryReader br)
+    public UserPermission GetPermission(string password)
     {
-        lock (_lock)
-        {
-            AdminPassword = br.ReadString();
-            _users.Clear();
-            br.Read(_users);
-        }
-    }
-
-    public void Write(BinaryWriter bw)
-    {
-        lock (_lock)
-        {
-            bw.Write(AdminPassword ?? string.Empty);
-            bw.Write(_users);
-        }
+        if (!string.IsNullOrEmpty(AdminPassword) && password == AdminPassword)
+            return UserPermission.Admin;
+        if (!string.IsNullOrEmpty(UserPassword) && password == UserPassword)
+            return UserPermission.User;
+        return UserPermission.None;
     }
 }

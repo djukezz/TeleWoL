@@ -4,9 +4,9 @@ using TeleWoL.Settings;
 
 namespace TeleWoL.States;
 
-internal class DeleteTargetState : UserStateBase
+internal class DeleteUsersState : StateBase
 {
-    public DeleteTargetState(UserSettings settings) : base(settings)
+    public override void Init()
     {
         Update();
     }
@@ -14,15 +14,15 @@ internal class DeleteTargetState : UserStateBase
     protected override Response? Execute(CommandBase command, out StateBase newState)
     {
         newState = this;
-        if (command is DeleteTargetCommand delete)
+        if (command is DeleteUserCommand delete)
         {
-            var res = delete.Execute();
+            delete.Execute();
             Update();
-            return res;
+            return null;
         }
-        if (command is GoHomeCommand)
+        if (command is IStateCommand stateCommand)
         {
-            newState = new MainState(_settings);
+            newState = stateCommand.Execute(StatesFactory);
             return null;
         }
 
@@ -32,8 +32,8 @@ internal class DeleteTargetState : UserStateBase
     private void Update()
     {
         _commands.Clear();
-        _commands.AddRange(_settings.GetTargets()
-            .Select(t => new DeleteTargetCommand(t, _settings)));
+        _commands.AddRange(GlobalSettings.GetAll().Where(s=>s.UserId != UserSettings.UserId)
+            .Select(t => new DeleteUserCommand(GlobalSettings, t)));
         _commands.Add(GoHomeCommand.Instance);
     }
 }

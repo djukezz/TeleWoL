@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using LaserControl.IoC;
+using Ninject;
+using Telegram.Bot.Types.ReplyMarkups;
 using TeleWoL.Settings;
 using TeleWoL.States;
 
@@ -12,10 +14,22 @@ internal class Session
 
     public Session(GlobalSettings settings, UserContext userContext)
     {
+        var userSettings = settings.GetOrAdd(userContext.UserId);
+
+        StandardKernel kernel = new StandardKernel(new StatesModule());
+        var statesFactory = new StatesFactory(kernel);
+
+        kernel.Bind<GlobalSettings>().ToConstant(settings);
+        kernel.Bind<UserContext>().ToConstant(userContext);
+        kernel.Bind<UserSettings>().ToConstant(userSettings);
+        kernel.Bind<StatesFactory>().ToConstant(statesFactory);
+
         UserContext = userContext;
 
         var s = settings.Get(userContext.UserId);
-        StateBase state = s == null ? new LoginState(settings, userContext) : new MainState(s);
+        StateBase state = userSettings.Permission == UserPermission.None ?
+            statesFactory.Create<LoginState>() :
+            statesFactory.Create<MainState>();
         ChangeState(state);
     }
 
