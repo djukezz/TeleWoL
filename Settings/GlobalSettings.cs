@@ -46,23 +46,4 @@ internal sealed class GlobalSettings
                 yield return user;
         }
     }
-
-    public void Read(BinaryReader br)
-    {
-        lock (_lock)
-        {
-            AdminPassword = br.ReadString();
-            _users.Clear();
-            br.Read(_users);
-        }
-    }
-
-    public void Write(BinaryWriter bw)
-    {
-        lock (_lock)
-        {
-            bw.Write(AdminPassword ?? string.Empty);
-            bw.Write(_users);
-        }
-    }
 }
