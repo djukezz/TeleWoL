@@ -93,7 +93,7 @@ async Task Process(ITelegramBotClient bot, CancellationToken ct, long chatId,
             text: response.Text == string.Empty ? "Select" : response.Text,
             replyMarkup: response.KeyboardMarkup,
             cancellationToken: ct);
-    }
+    }        
 }
 
 Task HandlePollingErrorAsync(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)

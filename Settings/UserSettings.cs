@@ -48,6 +48,27 @@ internal sealed class UserSettings
                 yield return target;
         }
     }
+
+    public void Write(BinaryWriter bw)
+    {
+        lock (_lock)
+        {
+            bw.Write(UserId);
+            bw.Write(UserName);
+            bw.Write(_targets);
+        }
+    }
+
+    public void Read(BinaryReader br)
+    {
+        lock (_lock)
+        {
+            UserId = br.ReadInt64();
+            UserName = br.ReadString();
+            _targets.Clear();
+            br.Read(_targets);
+        }
+    }
 }
 
 internal enum UserPermission : byte
