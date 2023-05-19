@@ -4,9 +4,9 @@ namespace TeleWoL.States;
 
 internal sealed class StatesFactory
 {
-    private readonly StandardKernel _kernel;
+    private readonly IKernel _kernel;
 
-    public StatesFactory(StandardKernel kernel)
+    public StatesFactory(IKernel kernel)
     {
         _kernel = kernel;
     }

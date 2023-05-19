@@ -15,6 +15,10 @@ internal sealed class GlobalSettings
     public string UserPassword { get; set; } = "1234";
     [JsonProperty]
     public string Token { get; set; } = "6050754775:AAFQUT_kLk8uzvvDDbaIk6hnDWJrkvTY-Mw";
+    [JsonProperty]
+    public string Subnet { get; set; } = "127.0.0.1";
+    [JsonProperty]
+    public string SubnetMask { get; set; } = "255.255.255.0";
 
     public UserSettings? Get(long userId)
     {

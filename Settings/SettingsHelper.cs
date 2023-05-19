@@ -3,8 +3,8 @@ using System.Text;
 
 namespace TeleWoL.Settings
 {
-    internal class SettingsWrapper<T> : IDisposable
-        where T:class, new()
+    internal class SettingsWrapper<T> : IDisposable, ISettingsSaver
+        where T : class, new()
     {
         private readonly string _filePath;
         private readonly JsonSerializer _serializer;
