@@ -8,7 +8,6 @@ namespace TeleWoL.WakeOnLan;
 
 internal sealed class MultipleNicWoLSender : IWoLSender, IDisposable
 {
-    private ConcurrentDictionary<MacAddress, byte[]> _cache = new ConcurrentDictionary<MacAddress, byte[]>();
     private List<SingleNicWoLSender> _senders;
 
     public MultipleNicWoLSender(Func<IPAddress, bool>? selector = null)
@@ -20,12 +19,6 @@ internal sealed class MultipleNicWoLSender : IWoLSender, IDisposable
     }
 
     public async Task Wake(MacAddress mac)
-    {
-        byte[] magicPacket = _cache.GetOrAdd(mac, m => MagicPacketBuilder.BuildMagicPacket(mac));
-        await Wake(magicPacket);
-    }
-
-    public async Task Wake(byte[] mac)
     {
         foreach (var sender in _senders)
         {

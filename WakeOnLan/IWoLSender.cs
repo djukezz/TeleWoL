@@ -5,5 +5,4 @@ namespace TeleWoL.WakeOnLan;
 internal interface IWoLSender : IDisposable
 {
     Task Wake(MacAddress mac);
-    Task Wake(byte[] mac);
 }
