@@ -1,5 +1,4 @@
-﻿using StateTest;
-using Telegram.Bot.Types.Enums;
+﻿using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using System.Collections.Concurrent;
@@ -7,19 +6,19 @@ using TeleWoL.Settings;
 using Ninject;
 using TeleWoL.IoC;
 
+namespace TeleWoL;
+
 internal sealed class Bot : IDisposable
 {
     private ConcurrentDictionary<long, Session> _sessions = new ConcurrentDictionary<long, Session>();
     private readonly StandardKernel _kernel;
     private GlobalSettings _settings;
-    private ISettingsSaver _settingsSaver;
     private CancellationTokenSource _cts;
 
     public Bot()
     {
-        _kernel = new StandardKernel(new SettingsModule());
+        _kernel = new StandardKernel(new SettingsModule(), new WoLModule());
         _settings = _kernel.Get<GlobalSettings>();
-        _settingsSaver = _kernel.Get<ISettingsSaver>();
         _cts = new CancellationTokenSource();
     }
 
@@ -29,7 +28,7 @@ internal sealed class Bot : IDisposable
     public void AddUsers(IEnumerable<long> ids) =>
         AddUsers(ids, UserPermission.User);
 
-    public void Start()
+    public async Task<User> Start()
     {
         if (string.IsNullOrWhiteSpace(_settings.Token))
             throw new Exception($"Token must be specified in settings file");
@@ -45,6 +44,8 @@ internal sealed class Bot : IDisposable
             },
             cancellationToken: _cts.Token
         );
+
+        return await botClient.GetMeAsync();
     }
 
     public void Stop()
@@ -86,7 +87,7 @@ internal sealed class Bot : IDisposable
 
         var chatId = message.Chat.Id;
 
-        var session = GetSession(user.Id);
+        var session = GetSession(user);
 
         if (messageText == string.Empty)
             return;
@@ -96,7 +97,7 @@ internal sealed class Bot : IDisposable
 
     private async Task ProcessQuery(ITelegramBotClient bot, CallbackQuery query, CancellationToken ct)
     {
-        var session = GetSession(query.From.Id);
+        var session = GetSession(query.From);
         if (string.IsNullOrEmpty(query.Data))
             return;
 
@@ -108,8 +109,6 @@ internal sealed class Bot : IDisposable
         Session session, string command)
     {
         var responses = session.Execute(command);
-        if (session.GetIsSettingsChanged())
-            _settingsSaver.Save();
         foreach (var response in responses)
         {
             await bot.SendTextMessageAsync(
@@ -125,8 +124,11 @@ internal sealed class Bot : IDisposable
         return Task.CompletedTask;
     }
 
-    Session GetSession(long userId) => _sessions.GetOrAdd(userId,
-            id => new Session(_kernel, new UserContext { UserId = id }));
+    Session GetSession(User user)
+    {
+        return _sessions.GetOrAdd(user.Id,
+            id => new Session(_kernel, new UserContext(user)));
+    }
 
     public void Dispose()
     {

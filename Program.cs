@@ -1,4 +1,6 @@
-﻿Console.WriteLine($"Admin ids can be specified by parameters");
+﻿using TeleWoL;
+
+Console.WriteLine($"Admin ids can be specified by parameters");
 
 using var bot = new Bot();
 var admins = Environment.GetCommandLineArgs().Skip(1)
@@ -6,7 +8,10 @@ var admins = Environment.GetCommandLineArgs().Skip(1)
     .Where(p => p.Item1)
     .Select(p => p.Item2);
 bot.AddAdmins(admins);
-bot.Start();
+
+var botUser = await bot.Start();
+Console.WriteLine($"@{botUser.Username}");
+Console.WriteLine($"t.me/{botUser.Username}");
 
 Console.WriteLine($"Press any key to terminate app");
 Console.ReadKey();

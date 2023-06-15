@@ -1,6 +1,4 @@
-﻿using Ninject.Planning.Targets;
-using StateTest;
-using TeleWoL.Settings;
+﻿using TeleWoL.Settings;
 
 namespace TeleWoL.Commands;
 

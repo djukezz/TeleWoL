@@ -1,6 +1,5 @@
 ﻿using Ninject;
 using Ninject.Modules;
-using StateTest;
 using TeleWoL.Settings;
 
 namespace TeleWoL.IoC;

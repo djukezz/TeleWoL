@@ -1,5 +1,4 @@
-﻿using StateTest;
-using TeleWoL.Commands;
+﻿using TeleWoL.Commands;
 using TeleWoL.Settings;
 
 namespace TeleWoL.States;

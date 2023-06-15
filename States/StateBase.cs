@@ -1,5 +1,4 @@
 ﻿using Ninject;
-using StateTest;
 using TeleWoL.Commands;
 using TeleWoL.Settings;
 

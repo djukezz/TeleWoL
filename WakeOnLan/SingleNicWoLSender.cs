@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Net;
+using TeleWoL.Settings;
 
 namespace TeleWoL.WakeOnLan;
 
@@ -16,7 +17,13 @@ internal sealed class SingleNicWoLSender : IWoLSender
         _remoteEp = new IPEndPoint(remote, 9);
     }
 
-    public async Task Send(byte[] data)
+    public async Task Wake(MacAddress mac)
+    {
+        byte[] data = MagicPacketBuilder.BuildMagicPacket(mac);
+        await Wake(data);
+    }
+
+    public async Task Wake(byte[] data)
     {
         lock (_lock)
         {

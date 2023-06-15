@@ -13,6 +13,10 @@ internal sealed class UserSettings
     public UserPermission Permission { get; set; }
     [JsonProperty]
     public string UserName { get; set; } = string.Empty;
+    [JsonProperty]
+    public string FirstName { get; set; } = string.Empty;
+    [JsonProperty]
+    public string LastName { get; set; } = string.Empty;
 
     [JsonProperty]
     private List<Target> Targets { get; set; } = new List<Target>();
@@ -46,6 +50,16 @@ internal sealed class UserSettings
         {
             foreach (var target in Targets)
                 yield return target;
+        }
+    }
+
+    public void Update(UserContext userContext)
+    {
+        lock (_lock)
+        {
+            UserName = userContext.UserName;
+            FirstName = userContext.FirstName;
+            LastName = userContext.LastName;
         }
     }
 }

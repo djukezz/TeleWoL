@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 
-namespace StateTest;
+namespace TeleWoL;
 
 internal record Response
 {

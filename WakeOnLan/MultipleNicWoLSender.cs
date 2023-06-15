@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 
 namespace TeleWoL.WakeOnLan;
 
-internal sealed class MultipleNicWoLSender : IDisposable
+internal sealed class MultipleNicWoLSender : IWoLSender, IDisposable
 {
     private ConcurrentDictionary<MacAddress, byte[]> _cache = new ConcurrentDictionary<MacAddress, byte[]>();
     private List<SingleNicWoLSender> _senders;
@@ -19,13 +19,17 @@ internal sealed class MultipleNicWoLSender : IDisposable
             .ToList();
     }
 
-    public async Task WakeOnLan(MacAddress mac)
+    public async Task Wake(MacAddress mac)
     {
         byte[] magicPacket = _cache.GetOrAdd(mac, m => MagicPacketBuilder.BuildMagicPacket(mac));
+        await Wake(magicPacket);
+    }
 
+    public async Task Wake(byte[] mac)
+    {
         foreach (var sender in _senders)
         {
-            await sender.Send(magicPacket);
+            await sender.Wake(mac);
         }
     }
 

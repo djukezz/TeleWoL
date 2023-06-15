@@ -6,22 +6,26 @@ using TeleWoL.IoC;
 using TeleWoL.Settings;
 using TeleWoL.States;
 
-namespace StateTest;
+namespace TeleWoL;
 
 internal class Session
 {
-    private bool _isSettingsChanged;
     private StateBase? _state;
+    private readonly ISettingsSaver _settingsSaver;
+
     public UserContext UserContext { get; }
 
     public Session(IKernel parentKernel, UserContext userContext)
     {
+        _settingsSaver = parentKernel.Get<ISettingsSaver>();
+
         StandardKernel kernel = new ChildKernel(parentKernel,
             new StatesModule(), new UserSettingsModule(userContext));
 
         UserContext = userContext;
         var statesFactory = kernel.Get<StatesFactory>();
-        var userSettings = kernel.Get<UserSettings>();
+        UserSettings userSettings = kernel.Get<UserSettings>();
+        userSettings.Update(userContext);
 
         StateBase state = userSettings.Permission == UserPermission.None ?
             statesFactory.Create<LoginState>() :
@@ -39,13 +43,6 @@ internal class Session
             yield return msg;
 
         yield return ChangeState(newState);
-    }
-
-    public bool GetIsSettingsChanged()
-    {
-        bool isSettingsChanged = _isSettingsChanged;
-        _isSettingsChanged = false;
-        return isSettingsChanged;
     }
 
     private Response ChangeState(StateBase state)
@@ -66,5 +63,5 @@ internal class Session
         return commandsResponse;
     }
 
-    private void SettingsChanged() => _isSettingsChanged = true;
+    private void SettingsChanged() => _settingsSaver.Save();
 }

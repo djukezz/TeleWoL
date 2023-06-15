@@ -9,12 +9,13 @@ namespace TeleWoL.Settings
         private readonly string _filePath;
         private readonly JsonSerializer _serializer;
         private Mutex _mutex;
+        private const string _name = "TeleWoLSettings";
 
         public SettingsWrapper(string filePath)
         {
             _filePath = filePath;
             Settings = new T();
-            _mutex = new Mutex(false, _filePath);
+            _mutex = new Mutex(false, _name);
             _serializer = new JsonSerializer
             {
                 Culture = System.Globalization.CultureInfo.InvariantCulture,
@@ -47,12 +48,12 @@ namespace TeleWoL.Settings
 
         public void Save()
         {
-            using Mutex mutex = new Mutex(false, _filePath);
             try
             {
                 _mutex.WaitOne();
                 using var fs = File.OpenWrite(_filePath);
-                using var sw = new StreamWriter(fs, Encoding.UTF8);
+                fs.SetLength(0);
+                using var sw = new StreamWriter(fs, Encoding.UTF8);                
                 _serializer.Serialize(new JsonTextWriter(sw), Settings);
             }
             finally
