@@ -1,8 +1,17 @@
-﻿using TeleWoL;
+﻿using Ninject;
+using TeleWoL;
+using TeleWoL.IoC;
+using TeleWoL.Settings;
 
 Console.WriteLine($"Admin ids can be specified by parameters");
 
-using var bot = new Bot();
+var kernel = new StandardKernel(new SettingsModule(), new WoLModule());
+var settings  = kernel.Get<GlobalSettings>();
+Console.WriteLine("Users:");
+foreach (UserSettings user in settings.GetAll().OrderBy(u=>u.Permission))
+    Console.WriteLine(user.ToString());
+
+using var bot = new Bot(kernel);
 var admins = Environment.GetCommandLineArgs().Skip(1)
     .Select(id => (long.TryParse(id, out long v), v))
     .Where(p => p.Item1)

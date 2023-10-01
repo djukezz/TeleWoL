@@ -25,7 +25,9 @@ internal class Session
         UserContext = userContext;
         var statesFactory = kernel.Get<StatesFactory>();
         UserSettings userSettings = kernel.Get<UserSettings>();
-        userSettings.Update(userContext);
+        bool isChanged = userSettings.Update(userContext);
+        if(isChanged)
+            _settingsSaver.Save();
 
         StateBase state = userSettings.Permission == UserPermission.None ?
             statesFactory.Create<LoginState>() :

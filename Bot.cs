@@ -11,13 +11,13 @@ namespace TeleWoL;
 internal sealed class Bot : IDisposable
 {
     private ConcurrentDictionary<long, Session> _sessions = new ConcurrentDictionary<long, Session>();
-    private readonly StandardKernel _kernel;
+    private readonly IKernel _kernel;
     private GlobalSettings _settings;
     private CancellationTokenSource _cts;
 
-    public Bot()
+    public Bot(IKernel kernel)
     {
-        _kernel = new StandardKernel(new SettingsModule(), new WoLModule());
+        _kernel = kernel;
         _settings = _kernel.Get<GlobalSettings>();
         _cts = new CancellationTokenSource();
     }

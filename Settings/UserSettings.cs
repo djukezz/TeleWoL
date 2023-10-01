@@ -53,13 +53,34 @@ internal sealed class UserSettings
         }
     }
 
-    public void Update(UserContext userContext)
+    public bool Update(UserContext userContext)
     {
         lock (_lock)
         {
-            UserName = userContext.UserName;
-            FirstName = userContext.FirstName;
-            LastName = userContext.LastName;
+            bool isChanged = Update(() => UserName, v => UserName = v, userContext.UserName) |
+                Update(() => FirstName, v => FirstName = v, userContext.FirstName) |
+                Update(() => LastName, v => LastName = v, userContext.LastName);
+            return isChanged;
         }
+    }
+
+    private bool Update<T>(Func<T> get, Action<T> set, T value)
+    {
+        var old = get();
+        if(EqualityComparer<T>.Default.Equals(get(), value))
+            return false;
+        set(value);
+        return true;
+    }
+
+    public override string ToString()
+    {
+        var parts = new[] { UserName, FirstName, LastName }
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .DefaultIfEmpty(UserId.ToString());
+        if (Permission == UserPermission.Admin)
+            parts = parts.Prepend("^");
+
+        return string.Join(" ", parts);
     }
 }

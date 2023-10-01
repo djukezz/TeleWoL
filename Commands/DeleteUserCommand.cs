@@ -9,11 +9,7 @@ internal sealed class DeleteUserCommand : CommandBase
         _settings = settings;
         _user = user;
 
-        string name = string.IsNullOrEmpty(user.UserName) ?
-            user.UserId.ToString() :
-            user.UserName;
-        if (user.Permission == UserPermission.Admin)
-            name = "^ " + name;
+        string name = user.ToString();
         Text = name;
         Id = $"delete_{_user.UserId}";
     }
