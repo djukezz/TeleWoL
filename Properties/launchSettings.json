@@ -1,10 +1,13 @@
 {
   "profiles": {
     "TeleWoL": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "settings.json",
+      "sqlDebugging": false
     },
     "WSL": {
       "commandName": "WSL2",
+      "commandLineArgs": "\"{OutDir}/TeleWoL.dll\" /home/user/settings.json",
       "distributionName": ""
     }
   }

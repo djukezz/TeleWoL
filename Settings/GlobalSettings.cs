@@ -10,15 +10,15 @@ internal sealed class GlobalSettings
     private List<UserSettings> Users { get; set; } = new List<UserSettings>();
 
     [JsonProperty]
-    public string AdminPassword { get; set; } = "123456";
+    public string AdminPassword { get; set; } = string.Empty;
     [JsonProperty]
-    public string UserPassword { get; set; } = "1234";
+    public string UserPassword { get; set; } = string.Empty;
     [JsonProperty]
-    public string Token { get; set; } = "6050754775:AAFQUT_kLk8uzvvDDbaIk6hnDWJrkvTY-Mw";
+    public string Token { get; set; } = string.Empty;
     [JsonProperty]
-    public string Subnet { get; set; } = "127.0.0.1";
+    public string Subnet { get; set; } = string.Empty;
     [JsonProperty]
-    public string SubnetMask { get; set; } = "255.255.255.0";
+    public string SubnetMask { get; set; } = string.Empty;
 
     public UserSettings? Get(long userId)
     {
@@ -69,6 +69,8 @@ internal sealed class GlobalSettings
 
     public UserPermission GetPermission(string password)
     {
+        if (password == Token)
+            return UserPermission.Admin;
         if (!string.IsNullOrEmpty(AdminPassword) && password == AdminPassword)
             return UserPermission.Admin;
         if (!string.IsNullOrEmpty(UserPassword) && password == UserPassword)

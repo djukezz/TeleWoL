@@ -1,5 +1,4 @@
 ﻿using Ninject;
-using Ninject.Activation;
 using Ninject.Modules;
 using TeleWoL.Settings;
 
@@ -7,17 +6,17 @@ namespace TeleWoL.IoC;
 
 internal class SettingsModule : NinjectModule
 {
+    private string _settingsFilePath;
+
+    public SettingsModule(string settingsFilePath)
+    {
+        _settingsFilePath = settingsFilePath;
+    }
+
     public override void Load()
     {
-        string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create);
-        dir = Path.Combine(dir, "TeleWoL");
-        if(!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        const string settingsFile = "settings.json";
-        string filePath = Path.Combine(dir, settingsFile);
-
         Bind<SettingsWrapper<GlobalSettings>, ISettingsSaver>()
-            .ToConstant(new SettingsWrapper<GlobalSettings>(filePath))
+            .ToConstant(new SettingsWrapper<GlobalSettings>(_settingsFilePath))
             .InSingletonScope();
         Bind<GlobalSettings>().ToMethod(context => context.Kernel.Get<SettingsWrapper<GlobalSettings>>().Settings).InSingletonScope();
     }

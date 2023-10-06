@@ -32,28 +32,13 @@ internal sealed class MultipleNicWoLSender : IWoLSender, IDisposable
             n.NetworkInterfaceType != NetworkInterfaceType.Loopback && n.OperationalStatus == OperationalStatus.Up))
         {
             IPInterfaceProperties iPInterfaceProperties = networkInterface.GetIPProperties();
-            foreach (MulticastIPAddressInformation multicastIPAddressInformation in iPInterfaceProperties.MulticastAddresses)
+            foreach (var info in iPInterfaceProperties.UnicastAddresses)
             {
-                IPAddress multicastIpAddress = multicastIPAddressInformation.Address;
-                if (multicastIpAddress.ToString().StartsWith("ff02::1%", StringComparison.OrdinalIgnoreCase)) // Ipv6: All hosts on LAN (with zone index)
-                {
-                    UnicastIPAddressInformation? unicastIPAddressInformation = iPInterfaceProperties.UnicastAddresses.Where((u) =>
-                        u.Address.AddressFamily == AddressFamily.InterNetworkV6 && !u.Address.IsIPv6LinkLocal).FirstOrDefault();
-                    if (unicastIPAddressInformation != null)
-                    {
-                        yield return (unicastIPAddressInformation.Address, multicastIpAddress);
-                    }
-                }
-                else if (multicastIpAddress.ToString().Equals("224.0.0.1")) // Ipv4: All hosts on LAN
-                {
-                    UnicastIPAddressInformation? unicastIPAddressInformation = iPInterfaceProperties.UnicastAddresses.Where((u) =>
-                        u.Address.AddressFamily == AddressFamily.InterNetwork && !iPInterfaceProperties.GetIPv4Properties().IsAutomaticPrivateAddressingActive).FirstOrDefault();
-                    if (unicastIPAddressInformation != null)
-                    {
-                        yield return (unicastIPAddressInformation.Address, multicastIpAddress);
-                    }
-                }
+                if (info.Address.AddressFamily != AddressFamily.InterNetwork)
+                    continue;
+                yield return (info.Address, IPAddress.Broadcast);
             }
+            yield break;
         }
     }
 

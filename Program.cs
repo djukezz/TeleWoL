@@ -3,9 +3,15 @@ using TeleWoL;
 using TeleWoL.IoC;
 using TeleWoL.Settings;
 
-Console.WriteLine($"Admin ids can be specified by parameters");
+if (args.Length < 1)
+{
+    Console.WriteLine("Path to settings file must be specified");
+    return;
+}
 
-var kernel = new StandardKernel(new SettingsModule(), new WoLModule());
+string settingsFilePath = args[0];
+
+var kernel = new StandardKernel(new SettingsModule(settingsFilePath), new WoLModule());
 var settings  = kernel.Get<GlobalSettings>();
 Console.WriteLine("Users:");
 foreach (UserSettings user in settings.GetAll().OrderBy(u=>u.Permission))
@@ -22,7 +28,6 @@ var botUser = await bot.Start();
 Console.WriteLine($"@{botUser.Username}");
 Console.WriteLine($"t.me/{botUser.Username}");
 
-Console.WriteLine($"Press any key to terminate app");
-Console.ReadKey();
+ConsoleHost.WaitForShutdown();
 
 bot.Stop();
